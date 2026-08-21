@@ -1,5 +1,6 @@
 /* ============================================
-   FOCUS B - SUPABASE
+   FOCUS B
+   CONEXIÓN SUPABASE
    ============================================ */
 
 const SUPABASE_URL =
@@ -31,27 +32,48 @@ let cart = [];
 async function loadProducts() {
 
     const container =
-        document.getElementById("products-container");
+        document.getElementById(
+            "products-container"
+        );
 
-    container.innerHTML =
-        `<div class="loading">Cargando productos...</div>`;
+
+    container.innerHTML = `
+        <div class="loading">
+            Cargando productos...
+        </div>
+    `;
 
 
     const { data, error } = await db
         .from("productos")
         .select("*")
-        .order("id_producto", {
-            ascending: true
-        });
+        .order(
+            "id_producto",
+            {
+                ascending: true
+            }
+        );
 
 
     if (error) {
 
-        console.error(error);
+        console.error(
+            "ERROR SUPABASE PRODUCTOS:",
+            error
+        );
+
 
         container.innerHTML = `
             <div class="loading">
-                <h3>No se pudieron cargar los productos.</h3>
+
+                <h3>
+                    Error al cargar productos
+                </h3>
+
+                <p>
+                    Revisa la consola del navegador.
+                </p>
+
             </div>
         `;
 
@@ -63,7 +85,11 @@ async function loadProducts() {
 
         container.innerHTML = `
             <div class="loading">
-                <h3>No hay productos disponibles.</h3>
+
+                <h3>
+                    No hay productos disponibles.
+                </h3>
+
             </div>
         `;
 
@@ -77,20 +103,28 @@ async function loadProducts() {
     data.forEach(product => {
 
         const card =
-            document.createElement("article");
+            document.createElement(
+                "article"
+            );
 
-        card.className = "product-item";
+
+        card.className =
+            "product-item";
 
 
         let emoji = "🍬";
 
+
         const category =
-            String(product.categoria || "")
-                .toLowerCase();
+            String(
+                product.categoria || ""
+            ).toLowerCase();
+
 
         const name =
-            String(product.nombre || "")
-                .toLowerCase();
+            String(
+                product.nombre || ""
+            ).toLowerCase();
 
 
         if (
@@ -102,20 +136,20 @@ async function loadProducts() {
 
 
         if (
-            category.includes("maracuyá") ||
             category.includes("maracuya") ||
-            name.includes("maracuyá") ||
-            name.includes("maracuya")
+            category.includes("maracuyá") ||
+            name.includes("maracuya") ||
+            name.includes("maracuyá")
         ) {
             emoji = "🥭";
         }
 
 
         if (
-            category.includes("limón") ||
             category.includes("limon") ||
-            name.includes("limón") ||
-            name.includes("limon")
+            category.includes("limón") ||
+            name.includes("limon") ||
+            name.includes("limón")
         ) {
             emoji = "🍋";
         }
@@ -129,11 +163,20 @@ async function loadProducts() {
         }
 
 
+        const stock =
+            Number(product.stock || 0);
+
+
+        const sinStock =
+            stock <= 0;
+
+
         card.innerHTML = `
 
             <div class="product-image">
                 ${emoji}
             </div>
+
 
             <div class="product-content">
 
@@ -141,26 +184,53 @@ async function loadProducts() {
                     ${product.categoria || "Focus B"}
                 </span>
 
+
                 <h3>
                     ${product.nombre || "Focus B"}
                 </h3>
+
 
                 <p class="product-description">
                     ${product.descripcion || ""}
                 </p>
 
+
                 <div class="product-bottom">
 
                     <span class="product-price">
-                        $${Number(product.precio || 0).toFixed(2)}
+                        $${Number(
+                            product.precio || 0
+                        ).toFixed(2)}
                     </span>
 
-                    <button
-                        class="add-button"
-                        onclick='addToCart(${JSON.stringify(product)})'
-                    >
-                        + Agregar
-                    </button>
+
+                    ${
+                        sinStock
+
+                        ? `
+                            <button
+                                class="add-button"
+                                disabled
+                                style="
+                                    opacity:.5;
+                                    cursor:not-allowed;
+                                "
+                            >
+                                Sin stock
+                            </button>
+                        `
+
+                        : `
+                            <button
+                                class="add-button"
+                                onclick='addToCart(
+                                    ${JSON.stringify(product)}
+                                )'
+                            >
+                                + Agregar
+                            </button>
+                        `
+                    }
 
                 </div>
 
@@ -191,13 +261,29 @@ function addToCart(product) {
 
     if (existing) {
 
-        existing.cantidad++;
+        if (
+            existing.cantidad <
+            Number(product.stock)
+        ) {
+
+            existing.cantidad++;
+
+        } else {
+
+            alert(
+                "No hay más unidades disponibles."
+            );
+
+        }
 
     } else {
 
         cart.push({
+
             ...product,
+
             cantidad: 1
+
         });
 
     }
@@ -216,13 +302,21 @@ function addToCart(product) {
 function updateCart() {
 
     const container =
-        document.getElementById("cart-items");
+        document.getElementById(
+            "cart-items"
+        );
+
 
     const count =
-        document.getElementById("cart-count");
+        document.getElementById(
+            "cart-count"
+        );
+
 
     const totalElement =
-        document.getElementById("cart-total");
+        document.getElementById(
+            "cart-total"
+        );
 
 
     const totalQuantity =
@@ -240,14 +334,23 @@ function updateCart() {
     if (cart.length === 0) {
 
         container.innerHTML = `
+
             <div class="empty-cart">
+
                 🛒
-                <p>Tu carrito está vacío.</p>
+
+                <p>
+                    Tu carrito está vacío.
+                </p>
+
             </div>
+
         `;
+
 
         totalElement.textContent =
             "$0.00";
+
 
         return;
     }
@@ -259,62 +362,71 @@ function updateCart() {
     let total = 0;
 
 
-    cart.forEach((item, index) => {
+    cart.forEach(
+        (item, index) => {
 
-        const subtotal =
-            Number(item.precio) *
-            item.cantidad;
-
-
-        total += subtotal;
+            const subtotal =
+                Number(item.precio) *
+                item.cantidad;
 
 
-        const div =
-            document.createElement("div");
+            total += subtotal;
 
 
-        div.className =
-            "cart-item";
+            const div =
+                document.createElement(
+                    "div"
+                );
 
 
-        div.innerHTML = `
-
-            <div class="cart-item-info">
-
-                <h4>
-                    ${item.nombre}
-                </h4>
-
-                <p>
-                    ${item.cantidad}
-                    ×
-                    $${Number(item.precio).toFixed(2)}
-                </p>
-
-            </div>
-
-            <div>
-
-                <strong>
-                    $${subtotal.toFixed(2)}
-                </strong>
-
-                <br>
-
-                <button
-                    onclick="removeFromCart(${index})"
-                >
-                    Eliminar
-                </button>
-
-            </div>
-
-        `;
+            div.className =
+                "cart-item";
 
 
-        container.appendChild(div);
+            div.innerHTML = `
 
-    });
+                <div class="cart-item-info">
+
+                    <h4>
+                        ${item.nombre}
+                    </h4>
+
+                    <p>
+                        ${item.cantidad}
+                        ×
+                        $${Number(
+                            item.precio
+                        ).toFixed(2)}
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        $${subtotal.toFixed(2)}
+                    </strong>
+
+                    <br>
+
+                    <button
+                        onclick="
+                            removeFromCart(${index})
+                        "
+                    >
+                        Eliminar
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(div);
+
+        }
+    );
 
 
     totalElement.textContent =
@@ -323,44 +435,56 @@ function updateCart() {
 
 
 /* ============================================
-   ELIMINAR PRODUCTO
+   ELIMINAR DEL CARRITO
    ============================================ */
 
 function removeFromCart(index) {
 
-    cart.splice(index, 1);
+    cart.splice(
+        index,
+        1
+    );
+
 
     updateCart();
 }
 
 
 /* ============================================
-   CARRITO
+   ABRIR CARRITO
    ============================================ */
 
 function openCart() {
 
     document
         .getElementById("cart")
-        .classList.add("active");
+        .classList
+        .add("active");
 
 
     document
         .getElementById("cart-overlay")
-        .classList.add("active");
+        .classList
+        .add("active");
 }
 
+
+/* ============================================
+   CERRAR CARRITO
+   ============================================ */
 
 function closeCart() {
 
     document
         .getElementById("cart")
-        .classList.remove("active");
+        .classList
+        .remove("active");
 
 
     document
         .getElementById("cart-overlay")
-        .classList.remove("active");
+        .classList
+        .remove("active");
 }
 
 
@@ -372,66 +496,99 @@ async function checkout() {
 
     if (cart.length === 0) {
 
-        alert("Tu carrito está vacío.");
-
-        return;
-    }
-
-
-    /*
-       FORMULARIO DEL CLIENTE
-    */
-
-    const nombre =
-        prompt("Escribe tu nombre:");
-
-    if (!nombre) {
-        return;
-    }
-
-
-    const ciudad =
-        prompt("Escribe tu ciudad:");
-
-    if (!ciudad) {
-        return;
-    }
-
-
-    const telefono =
-        prompt("Escribe tu teléfono:");
-
-    if (!telefono) {
-        return;
-    }
-
-
-    /*
-       BUSCAR CLIENTE
-    */
-
-    let cliente = null;
-
-
-    const { data: clientesExistentes, error: errorBusqueda } =
-        await db
-            .from("clientes")
-            .select("*")
-            .eq("telefono", telefono)
-            .limit(1);
-
-
-    if (errorBusqueda) {
-
-        console.error(errorBusqueda);
-
         alert(
-            "No se pudo consultar el cliente."
+            "Tu carrito está vacío."
         );
 
         return;
     }
 
+
+    /* -----------------------------
+       DATOS DEL CLIENTE
+       ----------------------------- */
+
+    const nombre =
+        prompt(
+            "Escribe el nombre del cliente:"
+        );
+
+
+    if (!nombre) {
+
+        return;
+    }
+
+
+    const ciudad =
+        prompt(
+            "Escribe la ciudad:"
+        );
+
+
+    if (!ciudad) {
+
+        return;
+    }
+
+
+    const telefono =
+        prompt(
+            "Escribe el teléfono:"
+        );
+
+
+    if (!telefono) {
+
+        return;
+    }
+
+
+    /* -----------------------------
+       BUSCAR CLIENTE
+       ----------------------------- */
+
+    let cliente = null;
+
+
+    const {
+        data: clientesExistentes,
+        error: errorBusqueda
+    } = await db
+
+        .from("clientes")
+
+        .select("*")
+
+        .eq(
+            "telefono",
+            telefono
+        )
+
+        .limit(1);
+
+
+    if (errorBusqueda) {
+
+        console.error(
+            "ERROR BUSCANDO CLIENTE:",
+            errorBusqueda
+        );
+
+
+        alert(
+            "No se pudo consultar el cliente.\n\n" +
+            errorBusqueda.message
+        );
+
+
+        return;
+    }
+
+
+    /* -----------------------------
+       CLIENTE EXISTENTE
+       ----------------------------- */
 
     if (
         clientesExistentes &&
@@ -441,31 +598,53 @@ async function checkout() {
         cliente =
             clientesExistentes[0];
 
-    } else {
-
-        /*
-           CREAR NUEVO CLIENTE
-        */
-
-        const { data: nuevoCliente, error } =
-            await db
-                .from("clientes")
-                .insert({
-                    nombre: nombre,
-                    ciudad: ciudad,
-                    telefono: telefono
-                })
-                .select()
-                .single();
+    }
 
 
-        if (error) {
+    /* -----------------------------
+       NUEVO CLIENTE
+       ----------------------------- */
 
-            console.error(error);
+    else {
+
+        const {
+            data: nuevoCliente,
+            error: errorCliente
+        } = await db
+
+            .from("clientes")
+
+            .insert({
+
+                nombre:
+                    nombre,
+
+                ciudad:
+                    ciudad,
+
+                telefono:
+                    telefono
+
+            })
+
+            .select()
+
+            .single();
+
+
+        if (errorCliente) {
+
+            console.error(
+                "ERROR CREANDO CLIENTE:",
+                errorCliente
+            );
+
 
             alert(
-                "No se pudo registrar el cliente."
+                "No se pudo registrar el cliente.\n\n" +
+                errorCliente.message
             );
+
 
             return;
         }
@@ -476,51 +655,61 @@ async function checkout() {
     }
 
 
-    /*
-       REGISTRAR CADA PRODUCTO
-       COMO UNA VENTA
-    */
+    /* -----------------------------
+       REGISTRAR LAS VENTAS
+       ----------------------------- */
 
-    for (const item of cart) {
+    for (
+        const item of cart
+    ) {
 
         const total =
             Number(item.precio) *
             item.cantidad;
 
 
-        const { error } =
-            await db
-                .from("ventas")
-                .insert({
+        const {
+            error: errorVenta
+        } = await db
 
-                    id_producto:
-                        item.id_producto,
+            .from("ventas")
 
-                    id_cliente:
-                        cliente.id_cliente,
+            .insert({
 
-                    fecha:
-                        new Date().toISOString(),
+                id_producto:
+                    item.id_producto,
 
-                    cantidad:
-                        item.cantidad,
+                id_cliente:
+                    cliente.id_cliente,
 
-                    precio_unitario:
-                        Number(item.precio),
+                fecha:
+                    new Date().toISOString(),
 
-                    total:
-                        total
-                });
+                cantidad:
+                    item.cantidad,
+
+                precio_unitario:
+                    Number(item.precio),
+
+                total:
+                    total
+
+            });
 
 
-        if (error) {
+        if (errorVenta) {
 
-            console.error(error);
+            console.error(
+                "ERROR REGISTRANDO VENTA:",
+                errorVenta
+            );
+
 
             alert(
-                "El cliente fue registrado, " +
-                "pero ocurrió un error al registrar la venta."
+                "No se pudo registrar la venta.\n\n" +
+                errorVenta.message
             );
+
 
             return;
         }
@@ -528,30 +717,55 @@ async function checkout() {
     }
 
 
-    /*
-       ÉXITO
-    */
+    /* -----------------------------
+       COMPRA EXITOSA
+       ----------------------------- */
+
+    const totalCompra =
+        cart.reduce(
+            (sum, item) =>
+                sum +
+                (
+                    Number(item.precio) *
+                    item.cantidad
+                ),
+            0
+        );
+
 
     cart = [];
+
 
     updateCart();
 
 
+    closeCart();
+
+
     alert(
-        "¡Compra registrada correctamente! 🎉\n\n" +
-        "Tu pedido ha sido registrado en Focus B."
+        "¡COMPRA REGISTRADA! 🎉\n\n" +
+
+        "Cliente: " +
+        nombre +
+
+        "\nTotal: $" +
+        totalCompra.toFixed(2) +
+
+        "\n\n" +
+
+        "La venta fue registrada correctamente en Supabase."
     );
 
 }
 
 
 /* ============================================
-   INICIAR
+   INICIAR PÁGINA
    ============================================ */
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function () {
 
         loadProducts();
 
