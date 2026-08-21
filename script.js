@@ -1,5 +1,5 @@
 /* ============================================
-   FOCUS B - CONFIGURACIÓN SUPABASE
+   FOCUS B - SUPABASE
    ============================================ */
 
 const SUPABASE_URL =
@@ -8,10 +8,6 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_lNxUrW2aAcjYXEUswq4R8Q_B5qeEKUO";
 
-
-/* ============================================
-   CONEXIÓN
-   ============================================ */
 
 const { createClient } = supabase;
 
@@ -29,7 +25,7 @@ let cart = [];
 
 
 /* ============================================
-   CARGAR PRODUCTOS DESDE SUPABASE
+   CARGAR PRODUCTOS
    ============================================ */
 
 async function loadProducts() {
@@ -51,12 +47,11 @@ async function loadProducts() {
 
     if (error) {
 
-        console.error("Error Supabase:", error);
+        console.error(error);
 
         container.innerHTML = `
             <div class="loading">
                 <h3>No se pudieron cargar los productos.</h3>
-                <p>Revisa la conexión con Supabase.</p>
             </div>
         `;
 
@@ -81,7 +76,8 @@ async function loadProducts() {
 
     data.forEach(product => {
 
-        const card = document.createElement("article");
+        const card =
+            document.createElement("article");
 
         card.className = "product-item";
 
@@ -89,10 +85,12 @@ async function loadProducts() {
         let emoji = "🍬";
 
         const category =
-            String(product.categoria || "").toLowerCase();
+            String(product.categoria || "")
+                .toLowerCase();
 
         const name =
-            String(product.nombre || "").toLowerCase();
+            String(product.nombre || "")
+                .toLowerCase();
 
 
         if (
@@ -104,12 +102,30 @@ async function loadProducts() {
 
 
         if (
+            category.includes("maracuyá") ||
+            category.includes("maracuya") ||
+            name.includes("maracuyá") ||
+            name.includes("maracuya")
+        ) {
+            emoji = "🥭";
+        }
+
+
+        if (
             category.includes("limón") ||
             category.includes("limon") ||
             name.includes("limón") ||
             name.includes("limon")
         ) {
             emoji = "🍋";
+        }
+
+
+        if (
+            category.includes("guayusa") ||
+            name.includes("guayusa")
+        ) {
+            emoji = "🌿";
         }
 
 
@@ -167,7 +183,9 @@ function addToCart(product) {
 
     const existing =
         cart.find(
-            item => item.id_producto === product.id_producto
+            item =>
+                item.id_producto ===
+                product.id_producto
         );
 
 
@@ -200,10 +218,8 @@ function updateCart() {
     const container =
         document.getElementById("cart-items");
 
-
     const count =
         document.getElementById("cart-count");
-
 
     const totalElement =
         document.getElementById("cart-total");
@@ -211,12 +227,14 @@ function updateCart() {
 
     const totalQuantity =
         cart.reduce(
-            (sum, item) => sum + item.cantidad,
+            (sum, item) =>
+                sum + item.cantidad,
             0
         );
 
 
-    count.textContent = totalQuantity;
+    count.textContent =
+        totalQuantity;
 
 
     if (cart.length === 0) {
@@ -228,7 +246,8 @@ function updateCart() {
             </div>
         `;
 
-        totalElement.textContent = "$0.00";
+        totalElement.textContent =
+            "$0.00";
 
         return;
     }
@@ -243,7 +262,8 @@ function updateCart() {
     cart.forEach((item, index) => {
 
         const subtotal =
-            Number(item.precio) * item.cantidad;
+            Number(item.precio) *
+            item.cantidad;
 
 
         total += subtotal;
@@ -253,7 +273,8 @@ function updateCart() {
             document.createElement("div");
 
 
-        div.className = "cart-item";
+        div.className =
+            "cart-item";
 
 
         div.innerHTML = `
@@ -265,7 +286,8 @@ function updateCart() {
                 </h4>
 
                 <p>
-                    ${item.cantidad} ×
+                    ${item.cantidad}
+                    ×
                     $${Number(item.precio).toFixed(2)}
                 </p>
 
@@ -286,6 +308,7 @@ function updateCart() {
                 </button>
 
             </div>
+
         `;
 
 
@@ -300,7 +323,7 @@ function updateCart() {
 
 
 /* ============================================
-   ELIMINAR
+   ELIMINAR PRODUCTO
    ============================================ */
 
 function removeFromCart(index) {
@@ -312,7 +335,7 @@ function removeFromCart(index) {
 
 
 /* ============================================
-   ABRIR / CERRAR CARRITO
+   CARRITO
    ============================================ */
 
 function openCart() {
@@ -355,11 +378,170 @@ async function checkout() {
     }
 
 
+    /*
+       FORMULARIO DEL CLIENTE
+    */
+
+    const nombre =
+        prompt("Escribe tu nombre:");
+
+    if (!nombre) {
+        return;
+    }
+
+
+    const ciudad =
+        prompt("Escribe tu ciudad:");
+
+    if (!ciudad) {
+        return;
+    }
+
+
+    const telefono =
+        prompt("Escribe tu teléfono:");
+
+    if (!telefono) {
+        return;
+    }
+
+
+    /*
+       BUSCAR CLIENTE
+    */
+
+    let cliente = null;
+
+
+    const { data: clientesExistentes, error: errorBusqueda } =
+        await db
+            .from("clientes")
+            .select("*")
+            .eq("telefono", telefono)
+            .limit(1);
+
+
+    if (errorBusqueda) {
+
+        console.error(errorBusqueda);
+
+        alert(
+            "No se pudo consultar el cliente."
+        );
+
+        return;
+    }
+
+
+    if (
+        clientesExistentes &&
+        clientesExistentes.length > 0
+    ) {
+
+        cliente =
+            clientesExistentes[0];
+
+    } else {
+
+        /*
+           CREAR NUEVO CLIENTE
+        */
+
+        const { data: nuevoCliente, error } =
+            await db
+                .from("clientes")
+                .insert({
+                    nombre: nombre,
+                    ciudad: ciudad,
+                    telefono: telefono
+                })
+                .select()
+                .single();
+
+
+        if (error) {
+
+            console.error(error);
+
+            alert(
+                "No se pudo registrar el cliente."
+            );
+
+            return;
+        }
+
+
+        cliente =
+            nuevoCliente;
+    }
+
+
+    /*
+       REGISTRAR CADA PRODUCTO
+       COMO UNA VENTA
+    */
+
+    for (const item of cart) {
+
+        const total =
+            Number(item.precio) *
+            item.cantidad;
+
+
+        const { error } =
+            await db
+                .from("ventas")
+                .insert({
+
+                    id_producto:
+                        item.id_producto,
+
+                    id_cliente:
+                        cliente.id_cliente,
+
+                    fecha:
+                        new Date().toISOString(),
+
+                    cantidad:
+                        item.cantidad,
+
+                    precio_unitario:
+                        Number(item.precio),
+
+                    total:
+                        total
+                });
+
+
+        if (error) {
+
+            console.error(error);
+
+            alert(
+                "El cliente fue registrado, " +
+                "pero ocurrió un error al registrar la venta."
+            );
+
+            return;
+        }
+
+    }
+
+
+    /*
+       ÉXITO
+    */
+
+    cart = [];
+
+    updateCart();
+
+
     alert(
-        "El carrito funciona correctamente. " +
-        "En el siguiente paso conectaremos " +
-        "el formulario de cliente con la tabla ventas de Supabase."
+        "¡Compra registrada correctamente! 🎉\n\n" +
+        "Tu pedido ha sido registrado en Focus B."
     );
+
 }
 
 
