@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Focus B | Energía natural</title>
+    <title>Focus B | Energía natural para enfocarte</title>
 
     <meta name="description"
           content="Focus B transforma la energía natural de la guayusa en una alternativa práctica para acompañar tus jornadas activas.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -22,7 +22,7 @@
 <header class="navbar">
 
     <a href="#inicio" class="logo">
-        <span class="logo-focus">Focus</span><span class="logo-b">B</span>
+        <span>Focus</span><b>B</b>
     </a>
 
     <nav>
@@ -42,8 +42,6 @@
 
 <main>
 
-<!-- HERO -->
-
 <section class="hero" id="inicio">
 
     <div class="hero-content">
@@ -62,6 +60,7 @@
         </p>
 
         <div class="hero-buttons">
+
             <a href="#producto" class="btn primary">
                 Comprar ahora
             </a>
@@ -69,9 +68,11 @@
             <a href="#nosotros" class="btn secondary">
                 Conocer Focus B
             </a>
+
         </div>
 
         <div class="hero-info">
+
             <div>
                 <strong>10</strong>
                 <span>gomitas</span>
@@ -84,8 +85,9 @@
 
             <div>
                 <strong>🇪🇨</strong>
-                <span>origen natural</span>
+                <span>origen ecuatoriano</span>
             </div>
+
         </div>
 
     </div>
@@ -105,7 +107,7 @@
             </div>
 
             <div class="product-gummy">
-                <span>F</span>
+                F
             </div>
 
             <h3>Gomitas energéticas</h3>
@@ -123,17 +125,17 @@
 </section>
 
 
-<!-- PROPUESTA -->
-
 <section class="section introduction" id="nosotros">
 
     <div class="section-title">
+
         <span class="eyebrow">CONOCE FOCUS B</span>
 
         <h2>
             Pequeño bocado.
             <span>Gran enfoque.</span>
         </h2>
+
     </div>
 
     <p class="intro-text">
@@ -146,8 +148,6 @@
 
 </section>
 
-
-<!-- BENEFICIOS -->
 
 <section class="benefits">
 
@@ -189,8 +189,6 @@
 
 </section>
 
-
-<!-- SABORES -->
 
 <section class="section flavors" id="sabores">
 
@@ -246,8 +244,6 @@
 </section>
 
 
-<!-- PRODUCTOS -->
-
 <section class="section products-section" id="producto">
 
     <div class="section-title">
@@ -260,8 +256,8 @@
         </h2>
 
         <p>
-            Nuestros productos se cargan directamente
-            desde nuestra base de datos.
+            Productos disponibles directamente desde nuestra
+            base de datos.
         </p>
 
     </div>
@@ -277,8 +273,6 @@
 
 </section>
 
-
-<!-- CTA -->
 
 <section class="cta">
 
@@ -307,9 +301,11 @@
 </main>
 
 
-<!-- CARRITO -->
+<div id="cart-overlay"
+     class="overlay"
+     onclick="closeCart()">
+</div>
 
-<div id="cart-overlay" class="overlay" onclick="closeCart()"></div>
 
 <aside id="cart" class="cart">
 
@@ -335,12 +331,21 @@
     <div class="cart-footer">
 
         <div class="cart-total">
+
             <span>Total</span>
-            <strong id="cart-total">$0.00</strong>
+
+            <strong id="cart-total">
+                $0.00
+            </strong>
+
         </div>
 
-        <button class="btn primary full" onclick="checkout()">
+        <button
+            class="btn primary full"
+            onclick="checkout()">
+
             Finalizar compra
+
         </button>
 
     </div>
@@ -366,6 +371,7 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="script.js"></script>
 
 </body>
