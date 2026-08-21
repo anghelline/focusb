@@ -2,9 +2,11 @@
    FOCUS B - CONFIGURACIÓN SUPABASE
    ============================================ */
 
-const SUPABASE_URL = "PEGA_AQUI_TU_API_URL";
+const SUPABASE_URL =
+    "https://yzrrsdihccbgccqgjoux.supabase.co";
 
-const SUPABASE_KEY = "PEGA_AQUI_TU_PUBLISHABLE_KEY";
+const SUPABASE_KEY =
+    "sb_publishable_lNxUrW2aAcjYXEUswq4R8Q_B5qeEKUO";
 
 
 /* ============================================
